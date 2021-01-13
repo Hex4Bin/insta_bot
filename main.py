@@ -1,11 +1,12 @@
 from selenium import webdriver
 from time import sleep
-from secrets import pw
+from secrets import usr, pw
 
 
 class InstaBot:
 
     def __init__(self, username, pw):
+        # Log in to Instagram with provided credentials
         self.driver = webdriver.Chrome()
         self.username = username
         self.driver.get("https://instagram.com")
@@ -26,6 +27,8 @@ class InstaBot:
             "//button[contains(text(), 'Not Now')]").click()
 
     def get_unfollowers(self):
+
+        # Open the following and followers section for comparison
         self.driver.find_element_by_xpath(
             f"//a[contains(@href, '{self.username}')]").click()
         sleep(1)
@@ -36,12 +39,16 @@ class InstaBot:
         self.driver.find_element_by_xpath(
             "//a[contains(@href, 'followers')]").click()
         followers = self.get_names()
+
+        # collect the users with list comprehension
         not_following_back = [
             user for user in following if user not in followers]
         print(not_following_back)
 
     def get_names(self):
         sleep(1)
+
+        # get the full list
         sugs = self.driver.find_element_by_xpath(
             "//div[@role='dialog']")
         sleep(1)
@@ -49,6 +56,8 @@ class InstaBot:
         scroll_box = self.driver.find_element_by_xpath(
             "/html/body/div[5]/div/div/div[2]")
         last_ht, ht = 0, 1
+
+        # scrolling down and waiting for the element loading
         while last_ht != ht:
             last_ht = ht
             sleep(1)
@@ -58,6 +67,7 @@ class InstaBot:
                 """, scroll_box)
         links = scroll_box.find_elements_by_tag_name('a')
         names = [name.text for name in links if name.text != '']
+
         # close button
         self.driver.find_element_by_xpath(
             "/html/body/div[5]/div/div/div[1]/div/div[2]/button").click()
@@ -65,6 +75,6 @@ class InstaBot:
 
 
 if __name__ == '__main__':
-    my_Bot = InstaBot('iamkucserag', pw)
+    my_Bot = InstaBot(usr, pw)
     my_Bot.get_unfollowers()
     sleep(5)
